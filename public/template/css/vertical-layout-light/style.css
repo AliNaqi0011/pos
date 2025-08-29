@@ -21603,6 +21603,21 @@ dl li {
 .preview-list .preview-item:last-child {
   border-bottom: 0;
 }
+    /* Reduce size of pagination arrows/icons */
+    .pagination .page-link svg,
+    .pagination .page-link .typcn {
+        width: 1em;
+        height: 1em;
+        font-size: 1em;
+        vertical-align: middle;
+    }
+
+    /* Optional: Adjust line height and padding to make the pagination compact */
+    .pagination .page-link {
+        padding: 0.3rem 0.6rem;
+        line-height: 1.2;
+    }
+
 
 .preview-list .preview-item .form-check {
   margin-top: 8px;

@@ -11,11 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('permissions', function (Blueprint $table) {
+        Schema::create('sale_payments', function (Blueprint $table) {
             $table->id();
-            $table->string('perimssion');
+            $table->foreignId('sale_id')->constrained()->onDelete('cascade');
+            $table->decimal('amount', 15, 2);
+            $table->string('payment_method'); // cash, card, etc.
+            $table->date('payment_date');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
+        
     }
 
     /**
@@ -23,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('permissions');
+        Schema::dropIfExists('sale_payments');
     }
 };

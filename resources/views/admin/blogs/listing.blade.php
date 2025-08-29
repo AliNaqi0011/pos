@@ -65,4 +65,23 @@
             </div>
         </div>
     </div>
+
+    <style>
+    /* Reduce pagination text size */
+    .relative.inline-flex.items-center.px-4.py-2.text-sm {
+        font-size: 0.75rem !important; /* smaller text */
+        padding: 0.25rem 0.5rem !important; /* smaller padding */
+    }
+
+    /* Reduce size of the SVG arrows */
+    .relative.inline-flex.items-center.px-2.py-2 svg {
+        width: 1rem !important;  /* 16px */
+        height: 1rem !important; /* 16px */
+    }
+
+    /* Reduce padding for arrow buttons */
+    .relative.inline-flex.items-center.px-2.py-2 {
+        padding: 0.25rem 0.5rem !important;
+    }
+</style>
 @endsection

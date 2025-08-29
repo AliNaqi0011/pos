@@ -2,22 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Cashier\Billable;
+use Spatie\Permission\Traits\HasRoles; // 👈 Add this
 
 class User extends Authenticatable
 {
-    use Billable, HasApiTokens, HasFactory, Notifiable;
+    use Billable, HasApiTokens, HasFactory, Notifiable, HasRoles; // 👈 Add HasRoles here
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -25,41 +20,44 @@ class User extends Authenticatable
         'password',
         'verification_code',
         'is_verified',
+        'tenant_id',
+        'status',
+        'payment_verified',
+        'approved_by',
+        'approved_at',
+        'rejection_reason',
+        'created_by'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'last_login' => 'datetime',
     ];
 
-
     public function userSettings()
     {
        return $this->hasOne(UserSetting::class);
     }
 
-    public function roles(){
-        return $this->belongsToMany(Role::class,'user_roles');
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
-    public function hasRole($role){
-        return $this->roles->contains('role',$role);
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function createdUsers()
+    {
+        return $this->hasMany(User::class, 'created_by');
     }
 
 }

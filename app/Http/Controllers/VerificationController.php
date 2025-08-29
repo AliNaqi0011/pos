@@ -130,15 +130,15 @@ class VerificationController extends Controller
     public function phone_verification(Request $request)
     {
         $otpmobilecode = mt_rand(1000, 9999);
-        $to = $request->phone_number;
-        $twilio = new Client(config('services.twilio.account_sid'), config('services.twilio.auth_token'));
-        $twilio->messages->create(
-            '+' . $to,
-            [
-                'from' => config('services.twilio.from'),
-                'body' => "Your otp for Phone verification is: $otpmobilecode",
-            ]
-        );
+        // $to = $request->phone_number;
+        // $twilio = new Client(config('services.twilio.account_sid'), config('services.twilio.auth_token'));
+        // $twilio->messages->create(
+        //     '+' . $to,
+        //     [
+        //         'from' => config('services.twilio.from'),
+        //         'body' => "Your otp for Phone verification is: $otpmobilecode",
+        //     ]
+        // );
         User::where('id', Auth::user()->id)->update([
             'phone_otp' => $otpmobilecode,
         ]);

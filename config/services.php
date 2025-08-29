@@ -43,6 +43,12 @@ return [
         'redirect' => 'http://127.0.0.1:8000/auth/google/callback',
     ],
 
+    'facebook' => [
+        'client_id' => '1073043073958753',
+        'client_secret' => 'ee4dee78b9932c0ff73cebfa8caa74dd',
+        'redirect' => 'http://127.0.0.1:8000/auth/facebook/callback',
+    ],
+
     'stripe' => [
         'client_id' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),

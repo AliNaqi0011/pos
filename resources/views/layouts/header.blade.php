@@ -8,21 +8,24 @@
     </div>
     <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
         <ul class="navbar-nav mr-lg-2">
-            <li class="nav-item  d-none d-lg-flex">
-                <a class="nav-link" href="#">
-                    Calendar
-                </a>
-            </li>
-            <li class="nav-item  d-none d-lg-flex">
-                <a class="nav-link active" href="#">
-                    Statistic
-                </a>
-            </li>
-            <li class="nav-item  d-none d-lg-flex">
-                <a class="nav-link" href="#">
-                    Employee
-                </a>
-            </li>
+            
+            <li class="nav-item d-none d-lg-flex">
+    <a class="nav-link" href="{{ url('/pos') }}">
+        <i class="typcn typcn-device-desktop menu-icon"></i>
+        <span class="menu-title"><b>POS</b></span>
+    </a>
+</li>
+
+@if(auth()->user()->hasRole('admin'))
+<li class="nav-item d-none d-lg-flex">
+    <a class="nav-link" href="{{ route('admin.project.settings.index') }}">
+        <i class="typcn typcn-cog menu-icon"></i>
+        <span class="menu-title"><b>Settings</b></span>
+    </a>
+</li>
+@endif
+
+            
             <li class="nav-item  d-none d-lg-flex">
                 <form method="post" action="{{ route('logout') }}">
                     @csrf
@@ -81,51 +84,25 @@
                     </a>
                 </div>
             </li>
-            <li class="nav-item dropdown  d-flex">
+            <li class="nav-item dropdown d-flex">
                 <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center" id="notificationDropdown" href="#" data-toggle="dropdown">
                     <i class="typcn typcn-bell mr-0"></i>
-                    <span class="count bg-danger">2</span>
+                    <span class="count bg-danger" id="notification-count">0</span>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-                    <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-                    <a class="dropdown-item preview-item">
-                        <div class="preview-thumbnail">
-                            <div class="preview-icon bg-success">
-                                <i class="typcn typcn-info-large mx-0"></i>
-                            </div>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown" style="width: 350px; max-height: 400px; overflow-y: auto;">
+                    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                        <p class="mb-0 font-weight-bold">Notifications</p>
+                        <button class="btn btn-sm btn-outline-primary" id="mark-all-read">Mark All Read</button>
+                    </div>
+                    <div id="notifications-container">
+                        <div class="text-center py-3">
+                            <i class="typcn typcn-bell" style="font-size: 48px; color: #ccc;"></i>
+                            <p class="text-muted">No notifications</p>
                         </div>
-                        <div class="preview-item-content">
-                            <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                            <p class="font-weight-light small-text mb-0">
-                                Just now
-                            </p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item">
-                        <div class="preview-thumbnail">
-                            <div class="preview-icon bg-warning">
-                                <i class="typcn typcn-cog mx-0"></i>
-                            </div>
-                        </div>
-                        <div class="preview-item-content">
-                            <h6 class="preview-subject font-weight-normal">Settings</h6>
-                            <p class="font-weight-light small-text mb-0">
-                                Private message
-                            </p>
-                        </div>
-                    </a>
-                    <a class="dropdown-item preview-item">
-                        <div class="preview-thumbnail">
-                            <div class="preview-icon bg-info">
-                                <i class="typcn typcn-user-outline mx-0"></i>
-                            </div>
-                        </div>
-                        <div class="preview-item-content">
-                            <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                            <p class="font-weight-light small-text mb-0">
-                                2 days ago
-                            </p>
-                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item text-center" href="{{ route('notifications.index') }}">
+                        <small>View All Notifications</small>
                     </a>
                 </div>
             </li>

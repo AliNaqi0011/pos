@@ -1,66 +1,246 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel POS SaaS System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive multi-tenant Point of Sale (POS) system built with Laravel, featuring subscription management, role-based access control, and FBR integration for Pakistan.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 🏢 Multi-Tenant SaaS Architecture
+- **Data Isolation**: Each tenant's data is completely isolated
+- **Subscription Management**: Stripe integration for recurring payments
+- **Role-Based Access**: 5 distinct roles (Super Admin, Admin, Seller, Manager, Sales)
+- **Tenant Management**: Super admin can manage all tenants
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 💼 Business Management
+- **Inventory Management**: Products, categories, brands, warehouses
+- **Sales Management**: POS system, quotations, invoices
+- **Purchase Management**: Purchase orders, returns, payments
+- **Customer Management**: Customer database and history
+- **Reporting**: Comprehensive sales, product, and customer reports
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🇵🇰 Pakistan-Specific Features
+- **FBR Integration**: Automatic invoice submission to Federal Board of Revenue
+- **Tax Compliance**: Built-in tax calculations and reporting
+- **Local Currency**: PKR support with proper formatting
 
-## Learning Laravel
+### 🎨 Customization
+- **Project Settings**: Each admin can customize their dashboard
+- **Branding**: Custom logos, company information
+- **Localization**: Multiple currencies, timezones, date formats
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Quick Start with Docker
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Prerequisites
+- Docker
+- Docker Compose
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Installation
 
-## Laravel Sponsors
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/AliNaqi0011/pos.git
+   cd pos
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2. **Copy environment file**
+   ```bash
+   cp .env.docker .env
+   ```
 
-### Premium Partners
+3. **Generate application key**
+   ```bash
+   docker-compose run --rm app php artisan key:generate
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+4. **Start the application**
+   ```bash
+   docker-compose up -d
+   ```
 
-## Contributing
+5. **Run migrations and seeders**
+   ```bash
+   docker-compose exec app php artisan migrate --seed
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+6. **Install dependencies**
+   ```bash
+   docker-compose exec app composer install
+   docker-compose exec app npm install && npm run build
+   ```
 
-## Code of Conduct
+### Access the Application
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- **Application**: http://localhost:8000
+- **Database**: localhost:3307 (MySQL)
+- **Redis**: localhost:6380
 
-## Security Vulnerabilities
+### Default Login Credentials
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Super Admin**: superadmin@example.com / password
+- **Admin**: admin@example.com / password
+- **Seller**: seller@example.com / password
+
+## Manual Installation
+
+### Requirements
+- PHP 8.2+
+- MySQL 8.0+
+- Redis
+- Composer
+- Node.js & NPM
+
+### Steps
+
+1. **Clone and install dependencies**
+   ```bash
+   git clone https://github.com/AliNaqi0011/pos.git
+   cd pos
+   composer install
+   npm install && npm run build
+   ```
+
+2. **Environment setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+3. **Database setup**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+4. **Start the application**
+   ```bash
+   php artisan serve
+   ```
+
+## System Architecture
+
+### Role Hierarchy
+```
+Super Admin
+├── Tenant Management
+├── Subscription Management
+├── Global Settings
+└── All System Access
+
+Admin (Per Tenant)
+├── User Management
+├── Business Operations
+├── Project Settings
+└── FBR Integration
+
+Seller/Manager/Sales
+├── POS Operations
+├── Inventory Management
+├── Customer Management
+└── Reporting (Limited)
+```
+
+### Data Flow
+```
+Registration → Plan Selection → Payment → Approval → Tenant Creation → Customization → Usage
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /login` - User login
+- `POST /register` - User registration
+- `POST /logout` - User logout
+
+### POS Operations
+- `GET /pos` - POS interface
+- `POST /pos/checkout` - Process sale
+- `GET /pos/products` - Get products
+
+### Management
+- `GET /admin/sales` - Sales management
+- `GET /admin/products` - Product management
+- `GET /admin/customers` - Customer management
+
+## Configuration
+
+### FBR Integration
+1. Go to Project Settings
+2. Enable FBR Integration
+3. Enter your FBR credentials:
+   - POS ID
+   - Username
+   - Password
+   - API URL (default: https://esp.fbr.gov.pk)
+4. Test connection
+
+### Subscription Plans
+Configure in Super Admin panel:
+- Plan names and features
+- Pricing (monthly/yearly)
+- User limits
+- Feature restrictions
+
+## Docker Services
+
+- **app**: Laravel application (PHP 8.2-FPM)
+- **webserver**: Nginx web server
+- **db**: MySQL 8.0 database
+- **redis**: Redis cache and sessions
+- **queue**: Laravel queue worker
+- **scheduler**: Laravel task scheduler
+
+## Development
+
+### Running Tests
+```bash
+docker-compose exec app php artisan test
+```
+
+### Queue Processing
+```bash
+docker-compose exec app php artisan queue:work
+```
+
+### Database Seeding
+```bash
+docker-compose exec app php artisan db:seed
+```
+
+## Production Deployment
+
+1. **Environment Configuration**
+   - Set `APP_ENV=production`
+   - Set `APP_DEBUG=false`
+   - Configure proper database credentials
+   - Set up SSL certificates
+
+2. **Optimization**
+   ```bash
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   ```
+
+3. **Queue Workers**
+   - Set up supervisor for queue workers
+   - Configure cron for scheduler
+
+## Support
+
+For support and questions:
+- GitHub Issues: [Create an issue](https://github.com/AliNaqi0011/pos/issues)
+- Email: support@yourcompany.com
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+**Built with ❤️ for the Pakistani business community**

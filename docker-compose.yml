@@ -34,21 +34,20 @@ services:
     depends_on:
       - app
 
-  # MySQL Database Service
+  # PostgreSQL Database Service
   db:
-    image: mysql:8.0
+    image: postgres:15
     container_name: laravel-pos-db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: laravel_pos
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_PASSWORD: user_password
-      MYSQL_USER: laravel_user
+      POSTGRES_DB: laravel_pos
+      POSTGRES_USER: laravel_user
+      POSTGRES_PASSWORD: user_password
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - dbdata:/var/lib/mysql
-      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+      - dbdata:/var/lib/postgresql/data
     ports:
-      - "3307:3306"
+      - "5433:5432"
     networks:
       - laravel-pos-network
 

@@ -70,7 +70,7 @@ A comprehensive multi-tenant Point of Sale (POS) system built with Laravel, feat
 ### Access the Application
 
 - **Application**: http://localhost:8000
-- **Database**: localhost:3307 (MySQL)
+- **Database**: localhost:5433 (PostgreSQL)
 - **Redis**: localhost:6380
 
 ### Default Login Credentials
@@ -83,7 +83,7 @@ A comprehensive multi-tenant Point of Sale (POS) system built with Laravel, feat
 
 ### Requirements
 - PHP 8.2+
-- MySQL 8.0+
+- PostgreSQL 15+
 - Redis
 - Composer
 - Node.js & NPM
@@ -182,7 +182,7 @@ Configure in Super Admin panel:
 
 - **app**: Laravel application (PHP 8.2-FPM)
 - **webserver**: Nginx web server
-- **db**: MySQL 8.0 database
+- **db**: PostgreSQL 15 database
 - **redis**: Redis cache and sessions
 - **queue**: Laravel queue worker
 - **scheduler**: Laravel task scheduler

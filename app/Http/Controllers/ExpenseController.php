@@ -51,7 +51,7 @@ class ExpenseController extends Controller
     public function store(Request $request) {
     $request->validate([
         'date' => 'required|date',
-        'warehouse_id' => 'required|exists:warehouses,id',
+        'warehouse_id' => 'nullable|exists:warehouses,id',
         'expense_category_id' => 'required|exists:expense_categories,id',
         'amount' => 'required|numeric|min:0',
         'title' => 'required|string|max:255',
@@ -60,7 +60,7 @@ class ExpenseController extends Controller
 
     // Generate unique reference code
     do {
-        $referenceCode = 'EXP-' . strtoupper(uniqid());
+        $referenceCode = 'EXP-' . strtoupper(bin2hex(random_bytes(8)));
         // Check if reference code already exists (just in case)
         $exists = \App\Models\Expense::where('reference_code', $referenceCode)->exists();
     } while ($exists);
@@ -119,6 +119,6 @@ class ExpenseController extends Controller
         $expense->notify(new ExpenseDeleteNotification($expense));
         $expense->delete();
 
-        return redirect()->route('expenses')->with('error', 'Expense deleted successfully!');
+        return redirect()->route('expenses')->with('success', 'Expense deleted successfully!');
     }
 }

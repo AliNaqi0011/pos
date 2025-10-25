@@ -37,81 +37,85 @@ class SaleController extends Controller
   
 
     public function store(Request $request)
-{
-    $request->validate([
-        'customer_id' => 'required|exists:customers,id',
-        'user_id' => 'required|exists:users,id',
-        'total_amount' => 'required|numeric',
-        'final_total' => 'required|numeric',
-        'products' => 'required|array',
-        'products.*.product_id' => 'required|exists:products,id',
-        'products.*.quantity' => 'required|numeric|min:1',
-        'products.*.total' => 'required|numeric',
-    ]);
-    DB::beginTransaction();
-
-    try {
-        // Ensure the status is one of the allowed values
-        $validStatuses = ['draft', 'final'];
-        $status = in_array($request->status, $validStatuses) ? $request->status : 'final';
-
-        // Ensure the payment_status is valid (based on migration definition)
-        $validPaymentStatuses = ['paid', 'unpaid', 'partial'];
-        $paymentStatus = in_array($request->payment_status, $validPaymentStatuses) ? $request->payment_status : 'unpaid';
-
-        // 1. Create Sale
-        $sale = Sale::create([
-            'customer_id'       => $request->customer_id,
-            'user_id'           => $request->user_id,
-            'total_items'       => count($request->products),
-            'total_amount'      => $request->total_amount,
-            'discount_type'     => $request->discount_type,
-            'discount_amount'   => $request->discount_amount ?? 0,
-            'tax_amount'        => $request->tax_amount ?? 0,
-            'shipping_charges'  => $request->shipping_charges ?? 0,
-            'final_total'       => $request->final_total,
-            'status'            => $status,
-            'payment_status'    => $paymentStatus,
-            'paid_amount'       => $request->paid_amount ?? 0,
-            'sale_date'         => now(),
-            'notes'             => $request->notes,
+    {
+        $validated = $request->validate([
+            'customer_id' => 'nullable|exists:customers,id',
+            'user_id' => 'required|exists:users,id',
+            'total_amount' => 'required|numeric|min:0',
+            'final_total' => 'required|numeric|min:0',
+            'products' => 'required|array|min:1',
+            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
+            'products.*.total' => 'required|numeric|min:0',
+            'status' => 'nullable|in:draft,final',
+            'payment_status' => 'nullable|in:paid,unpaid,partial'
         ]);
 
-        // 2. Create Sale Items
-        foreach ($request->products as $item) {
-            $product = Product::findOrFail($item['product_id']);
+        DB::beginTransaction();
 
-            SaleItem::create([
-                'sale_id'           => $sale->id,
-                'product_id'        => $product->id,
-                'product_price'     => $product->sale_price,
-                'quantity'          => $item['quantity'],
-                'tax_percent'       => $item['tax_percent'] ?? 0,
-                'tax_amount'        => $item['tax_amount'] ?? 0,
-                'discount_percent'  => $item['discount_percent'] ?? 0,
-                'discount_amount'   => $item['discount_amount'] ?? 0,
-                'total'             => $item['total'],
+        try {
+            // Check stock availability first
+            foreach ($validated['products'] as $item) {
+                $product = Product::find($item['product_id']);
+                if (!$product || $product->quantity < $item['quantity']) {
+                    throw new \Exception("Insufficient stock for product: " . ($product ? $product->name : 'Unknown') . ". Available: " . ($product ? $product->quantity : 0));
+                }
+            }
+
+            // Create Sale
+            $sale = Sale::create([
+                'customer_id'       => $validated['customer_id'] ?? null,
+                'user_id'           => $validated['user_id'],
+                'total_items'       => count($validated['products']),
+                'total_amount'      => $validated['total_amount'],
+                'discount_type'     => $request->discount_type,
+                'discount_amount'   => $request->discount_amount ?: 0,
+                'tax_amount'        => $request->tax_amount ?: 0,
+                'shipping_charges'  => $request->shipping_charges ?: 0,
+                'final_total'       => $validated['final_total'],
+                'status'            => isset($validated['status']) ? $validated['status'] : 'final',
+                'payment_status'    => isset($validated['payment_status']) ? $validated['payment_status'] : 'unpaid',
+                'paid_amount'       => $request->paid_amount ?: 0,
+                'sale_date'         => now(),
+                'notes'             => $request->notes,
             ]);
 
-            // Update stock with validation
-            if ($product->quantity >= $item['quantity']) {
+            // Create Sale Items and update stock
+            foreach ($validated['products'] as $item) {
+                $product = Product::find($item['product_id']);
+
+                SaleItem::create([
+                    'sale_id'           => $sale->id,
+                    'product_id'        => $product->id,
+                    'product_price'     => $product->sale_price ?: ($product->price ?: 0),
+                    'quantity'          => $item['quantity'],
+                    'tax_percent'       => isset($item['tax_percent']) ? $item['tax_percent'] : 0,
+                    'tax_amount'        => isset($item['tax_amount']) ? $item['tax_amount'] : 0,
+                    'discount_percent'  => isset($item['discount_percent']) ? $item['discount_percent'] : 0,
+                    'discount_amount'   => isset($item['discount_amount']) ? $item['discount_amount'] : 0,
+                    'total'             => $item['total'],
+                ]);
+
+                // Update stock
                 $product->decrement('quantity', $item['quantity']);
-            } else {
-                throw new \Exception("Insufficient stock for product: {$product->name}");
             }
+
+            // Notify users
+            try {
+                Notification::send(User::all(), new SaleCreateNotification($sale));
+            } catch (\Exception $e) {
+                // Log notification error but don't fail the sale
+                \Log::warning('Failed to send sale notification: ' . $e->getMessage());
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.sales.index')->with('success', 'Sale created successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
         }
-
-        // 3. Notify All Users (Optional)
-        Notification::send(User::all(), new SaleCreateNotification($sale));
-
-        DB::commit();
-
-        return redirect()->route('admin.sales.index')->with('success', 'Sale created successfully!');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->withErrors(['error' => 'Something went wrong: ' . $e->getMessage()])->withInput();
     }
-}
 
 
 

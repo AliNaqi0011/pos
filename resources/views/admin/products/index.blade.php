@@ -37,9 +37,8 @@
                                             <img src="{{ asset('images/no-image.png') }}" alt="No Image" width="50" height="50">
                                         @endif
                                         </td>
-                                        </td>
                                         <td>{{ $product->name }}</td>
-                                        <td>{{ $product->category->name }}</td>
+                                        <td>{{ $product->category ? $product->category->name : 'No Category' }}</td>
                                         <td>${{ $product->price }}</td>
                                         <td>{{ $product->quantity }}</td>
                                         <td>

@@ -12,16 +12,19 @@ class FBRService
 
     public function __construct()
     {
-        $this->settings = UserSetting::where('user_id', auth()->id())->first();
+        // Settings will be loaded when needed
+        $this->settings = null;
     }
 
     public function isEnabled()
     {
+        $this->loadSettings();
         return $this->settings && $this->settings->fbr_enabled;
     }
 
     public function submitInvoice($saleData)
     {
+        $this->loadSettings();
         if (!$this->isEnabled()) {
             return ['success' => false, 'message' => 'FBR integration not enabled'];
         }
@@ -70,6 +73,7 @@ class FBRService
 
     public function testConnection()
     {
+        $this->loadSettings();
         if (!$this->isEnabled()) {
             return ['success' => false, 'message' => 'FBR integration not enabled'];
         }
@@ -87,6 +91,13 @@ class FBRService
             ];
         } catch (\Exception $e) {
             return ['success' => false, 'message' => 'Connection error: ' . $e->getMessage()];
+        }
+    }
+    
+    private function loadSettings()
+    {
+        if ($this->settings === null && auth()->check()) {
+            $this->settings = UserSetting::where('user_id', auth()->id())->first();
         }
     }
 }

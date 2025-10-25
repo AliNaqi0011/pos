@@ -13,15 +13,18 @@ class BrandController extends Controller
 {
     public function index(Request $request)
 {
-    $sortBy = $request->get('sort_by', 'id');
-    $sortOrder = $request->get('sort_order', 'desc');
+    $allowedSortColumns = ['id', 'name', 'description', 'created_at', 'updated_at'];
+    $sortBy = in_array($request->get('sort_by'), $allowedSortColumns) ? $request->get('sort_by') : 'id';
+    $sortOrder = in_array($request->get('sort_order'), ['asc', 'desc']) ? $request->get('sort_order') : 'desc';
     $search = $request->get('search', '');
 
-    $query = Brand::query();
+    $query = Brand::select(['id', 'name', 'description', 'created_at', 'updated_at']);
 
     if (!empty($search)) {
-        $query->where('name', 'like', "%{$search}%")
+        $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
               ->orWhere('description', 'like', "%{$search}%");
+        });
     }
 
     $brands = $query->orderBy($sortBy, $sortOrder)->paginate(10);
@@ -30,11 +33,11 @@ class BrandController extends Controller
         return response()->json([
             'brands' => $brands->items(),
             'pagination' => (string) $brands->links(),
-            'sort_by' => $sortBy,
-            'sort_order' => $sortOrder,
+            'sort_by' => e($sortBy),
+            'sort_order' => e($sortOrder),
             'current_page' => $brands->currentPage(),
             'per_page' => $brands->perPage(),
-            'search' => $search,
+            'search' => e($search),
         ]);
     }
 
@@ -104,6 +107,6 @@ class BrandController extends Controller
 
         $brand->delete();
 
-        return redirect()->route('brands')->with('error', 'Brand deleted successfully!');
+        return redirect()->route('brands')->with('success', 'Brand deleted successfully!');
     }
 }

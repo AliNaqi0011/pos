@@ -45,21 +45,23 @@
         }
 
         .pos-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
-            padding: 20px;
+            padding: 25px;
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 0 0 20px 20px;
         }
 
         .pos-title {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 28px;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .pos-time {
@@ -69,9 +71,10 @@
 
         /* Filters Section */
         .filters-section {
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 2px solid #e2e8f0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .filter-row {
@@ -128,8 +131,9 @@
 
         .filter-select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+            transform: translateY(-1px);
         }
 
         .search-container {
@@ -148,8 +152,9 @@
 
         .search-input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+            transform: translateY(-1px);
         }
 
         .search-icon {
@@ -175,18 +180,19 @@
 
         .product-card {
             background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-color: #667eea;
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(79, 70, 229, 0.15);
+            border-color: #4f46e5;
         }
 
         .product-image {
@@ -269,10 +275,11 @@
         }
 
         .cart-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
         .cart-title {
@@ -314,6 +321,8 @@
             flex: 1;
             overflow-y: auto;
             padding: 0;
+            max-height: 400px;
+            min-height: 300px;
         }
 
         .cart-empty {
@@ -332,22 +341,30 @@
         }
 
         .cart-item {
-            padding: 15px 20px;
+            padding: 12px 15px;
             border-bottom: 1px solid #f1f3f4;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            min-height: 70px;
+            transition: all 0.3s ease;
+        }
+        
+        .cart-item:hover {
+            background: #f8fafc;
+            transform: translateX(5px);
         }
 
         .cart-item-image {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             border-radius: 8px;
             background: #f8f9fa;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .cart-item-image img {
@@ -361,58 +378,73 @@
         }
 
         .cart-item-name {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: #212529;
             margin-bottom: 2px;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 120px;
         }
 
         .cart-item-price {
-            font-size: 12px;
-            color: #667eea;
+            font-size: 11px;
+            color: #4f46e5;
             font-weight: 600;
         }
 
         .cart-item-controls {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            flex-shrink: 0;
         }
 
         .qty-btn {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border: 1px solid #dee2e6;
             background: white;
-            border-radius: 6px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
+            font-size: 12px;
         }
 
         .qty-btn:hover {
-            background: #667eea;
+            background: #4f46e5;
             color: white;
-            border-color: #667eea;
+            border-color: #4f46e5;
+            transform: scale(1.1);
         }
 
         .qty-input {
-            width: 50px;
+            width: 40px;
             text-align: center;
             border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 4px;
-            font-size: 12px;
+            border-radius: 4px;
+            padding: 2px;
+            font-size: 11px;
+            height: 24px;
         }
 
         .remove-btn {
             color: #dc3545;
             cursor: pointer;
-            padding: 4px;
+            padding: 2px;
             border-radius: 4px;
             transition: all 0.2s ease;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .remove-btn:hover {
@@ -513,9 +545,11 @@
         }
 
         .payment-method.active {
-            border-color: #667eea;
-            background: #f8f9ff;
-            color: #667eea;
+            border-color: #4f46e5;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            color: #4f46e5;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
         }
 
         .payment-method i {
@@ -526,24 +560,27 @@
 
         .checkout-btn {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 18px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .checkout-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
         }
 
         .checkout-btn:disabled {
@@ -589,6 +626,16 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Receipt Modal Styling */
+        .receipt-modal {
+            font-family: 'Poppins', sans-serif !important;
+        }
+        
+        .receipt-title {
+            font-size: 20px !important;
+            color: #333 !important;
+        }
     </style>
 </head>
 <body>
@@ -598,10 +645,21 @@
             <!-- Header -->
             <div class="pos-header">
                 <div class="pos-title">
-                    <i class="fas fa-cash-register"></i>
-                    Point of Sale
+                    <i class="fas fa-store"></i>
+                    Smart POS System
                 </div>
-                <div class="pos-time" id="current-time"></div>
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light btn-sm" id="dashboard-btn" onclick="goToDashboard()" title="Go to Dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </button>
+                    <button class="btn btn-light btn-sm" id="fullscreen-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                    <div class="pos-time" id="current-time"></div>
+                    <div class="badge badge-light px-3 py-2">
+                        <i class="fas fa-user"></i> {{ Auth::user()->name }}
+                    </div>
+                </div>
             </div>
 
             <!-- Filters -->
@@ -690,8 +748,8 @@
         <div class="cart-panel">
             <!-- Cart Header -->
             <div class="cart-header">
-                <div class="cart-title">Current Order</div>
-                <div class="cart-subtitle">Add products to create order</div>
+                <div class="cart-title">🛒 Shopping Cart</div>
+                <div class="cart-subtitle">Build your perfect order</div>
             </div>
 
             <!-- Customer Selection -->
@@ -772,8 +830,8 @@
                     </div>
                 </div>
                 <button class="checkout-btn" id="checkout-btn" disabled>
-                    <i class="fas fa-check-circle"></i>
-                    Complete Sale
+                    <i class="fas fa-credit-card"></i>
+                    Process Payment
                 </button>
             </div>
         </div>
@@ -956,11 +1014,11 @@
                 cartHtml += `
                     <div class="cart-item">
                         <div class="cart-item-image">
-                            <i class="fas fa-box"></i>
+                            <i class="fas fa-box" style="font-size: 16px; color: #6b7280;"></i>
                         </div>
                         <div class="cart-item-info">
-                            <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">$${item.price.toFixed(2)} each</div>
+                            <div class="cart-item-name" title="${item.name}">${item.name}</div>
+                            <div class="cart-item-price">$${item.price.toFixed(2)}</div>
                         </div>
                         <div class="cart-item-controls">
                             <button class="qty-btn" onclick="updateQuantity(${index}, -1)">
@@ -971,8 +1029,8 @@
                             <button class="qty-btn" onclick="updateQuantity(${index}, 1)">
                                 <i class="fas fa-plus"></i>
                             </button>
-                            <button class="remove-btn" onclick="removeFromCart(${index})">
-                                <i class="fas fa-trash"></i>
+                            <button class="remove-btn" onclick="removeFromCart(${index})" title="Remove item">
+                                <i class="fas fa-times"></i>
                             </button>
                         </div>
                     </div>
@@ -1121,8 +1179,212 @@
             });
         }
 
+        function showReceipt(receipt) {
+            if (!receipt || !receipt.sale_id) {
+                console.error('Invalid receipt data:', receipt);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sale Completed!',
+                    text: 'Sale was successful but receipt data is unavailable.',
+                    confirmButtonText: 'New Sale'
+                }).then(() => {
+                    resetPOS();
+                });
+                return;
+            }
+            
+            const receiptHtml = `
+                <div style="font-family: 'Courier New', monospace; max-width: 400px; margin: 0 auto; background: white; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                    <!-- Header -->
+                    <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
+                        <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: #333;">🏪 SMART POS</h2>
+                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Point of Sale System</p>
+                        <p style="margin: 5px 0 0 0; font-size: 11px; color: #888;">📍 123 Business Street, City</p>
+                        <p style="margin: 2px 0 0 0; font-size: 11px; color: #888;">📞 +1 (555) 123-4567</p>
+                    </div>
+                    
+                    <!-- Sale Info -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="font-weight: bold;">Receipt #:</span>
+                            <span>#${receipt.sale_id}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="font-weight: bold;">Date:</span>
+                            <span>${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="font-weight: bold;">Customer:</span>
+                            <span>${receipt.customer || 'Walk-in Customer'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="font-weight: bold;">Cashier:</span>
+                            <span>{{ Auth::user()->name }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Items -->
+                    <div style="border-top: 1px dashed #666; border-bottom: 1px dashed #666; padding: 15px 0;">
+                        <h4 style="margin: 0 0 10px 0; font-size: 14px; text-align: center; text-transform: uppercase;">Items Purchased</h4>
+                        ${(receipt.items || []).map(item => `
+                            <div style="margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                                    <span>${item.product_name || item.name || 'Product'}</span>
+                                    <span>$${(item.total || (item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>
+                                </div>
+                                <div style="font-size: 11px; color: #666; margin-left: 10px;">
+                                    ${item.quantity || 1} × $${(item.price || 0).toFixed(2)} each
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- Totals -->
+                    <div style="margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Subtotal:</span>
+                            <span>$${(receipt.subtotal || 0).toFixed(2)}</span>
+                        </div>
+                        ${(receipt.discount || 0) > 0 ? `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #d63384;">
+                                <span>Discount:</span>
+                                <span>-$${(receipt.discount || 0).toFixed(2)}</span>
+                            </div>
+                        ` : ''}
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Tax (10%):</span>
+                            <span>$${(receipt.tax || 0).toFixed(2)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; border-top: 2px solid #333; padding-top: 8px; margin-top: 8px;">
+                            <span>TOTAL:</span>
+                            <span>$${(receipt.total || 0).toFixed(2)}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Info -->
+                    <div style="margin-top: 20px; text-align: center; padding-top: 15px; border-top: 1px dashed #666;">
+                        <p style="margin: 0; font-weight: bold;">💳 Payment Method: ${(receipt.payment_method || 'cash').toUpperCase()}</p>
+                        <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Amount Paid: $${(receipt.total || 0).toFixed(2)}</p>
+                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Change: $0.00</p>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div style="margin-top: 20px; text-align: center; border-top: 1px dashed #666; padding-top: 15px;">
+                        <p style="margin: 0; font-size: 14px; font-weight: bold;">✨ Thank You for Your Business! ✨</p>
+                        <p style="margin: 5px 0 0 0; font-size: 11px; color: #666;">Please keep this receipt for your records</p>
+                        <p style="margin: 5px 0 0 0; font-size: 10px; color: #888;">Visit us again soon!</p>
+                        <div style="margin-top: 15px; font-size: 10px; color: #aaa;">
+                            <p style="margin: 0;">Powered by Smart POS System</p>
+                            <p style="margin: 2px 0 0 0;">www.smartpos.com</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            Swal.fire({
+                title: '<i class="fas fa-receipt" style="color: #10b981;"></i> Sale Completed Successfully!',
+                html: receiptHtml,
+                width: 500,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-print"></i> Print Receipt',
+                cancelButtonText: '<i class="fas fa-plus-circle"></i> New Sale',
+                reverseButtons: true,
+                confirmButtonColor: '#4f46e5',
+                cancelButtonColor: '#10b981',
+                customClass: {
+                    popup: 'receipt-modal',
+                    title: 'receipt-title'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    printReceipt(receiptHtml);
+                }
+                // Reset cart for new sale
+                resetPOS();
+            });
+        }
+        
+        function printReceipt(receiptHtml) {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head><title>Receipt</title></head>
+                    <body onload="window.print(); window.close();">
+                        ${receiptHtml}
+                    </body>
+                </html>
+            `);
+        }
+        
+        function resetPOS() {
+            cart = [];
+            updateCartDisplay();
+            calculateTotals();
+            $('#customer-select').val('');
+            $('#discount-value').val('');
+            discountValue = 0;
+            $('#discount-form').removeClass('active');
+            $('#discount-arrow').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    $('#fullscreen-btn').html('<i class="fas fa-compress"></i> Exit Fullscreen');
+                }).catch(err => {
+                    console.log('Error attempting to enable fullscreen:', err);
+                });
+            } else {
+                document.exitFullscreen().then(() => {
+                    $('#fullscreen-btn').html('<i class="fas fa-expand"></i> Fullscreen');
+                }).catch(err => {
+                    console.log('Error attempting to exit fullscreen:', err);
+                });
+            }
+        }
+
+        function goToDashboard() {
+            if (cart.length > 0) {
+                Swal.fire({
+                    title: 'Unsaved Items in Cart',
+                    text: 'You have items in your cart. Are you sure you want to leave?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Leave',
+                    cancelButtonText: 'Stay Here'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/dashboard';
+                    }
+                });
+            } else {
+                window.location.href = '/dashboard';
+            }
+        }
+
+        // Listen for fullscreen changes
+        document.addEventListener('fullscreenchange', function() {
+            if (document.fullscreenElement) {
+                $('#fullscreen-btn').html('<i class="fas fa-compress"></i> Exit Fullscreen');
+            } else {
+                $('#fullscreen-btn').html('<i class="fas fa-expand"></i> Fullscreen');
+            }
+        });
+
         function processCheckout() {
-            const customerId = $('#customer-select').val() || null;
+            // STRICT: Only use existing customer ID - NEVER create new customers
+            const customerSelectValue = $('#customer-select').val();
+            const customerId = (customerSelectValue && 
+                               customerSelectValue !== '' && 
+                               customerSelectValue !== 'null' && 
+                               customerSelectValue !== '0') ? customerSelectValue : null;
+            
+            // Log for debugging
+            console.log('POS Checkout - Customer Selection:', {
+                'raw_value': customerSelectValue,
+                'processed_customer_id': customerId,
+                'will_create_customer': false
+            });
             const subtotal = cart.reduce((sum, item) => sum + item.total, 0);
             
             let discount = 0;
@@ -1138,20 +1400,21 @@
             const tax = taxableAmount * 0.10;
             const total = taxableAmount + tax;
 
+            // Transform cart items to match expected format
+            const transformedItems = cart.map(item => ({
+                product_id: item.id,
+                price: item.price,
+                quantity: item.quantity,
+                total: item.total
+            }));
+
             const orderData = {
                 customer_id: customerId,
-                items: cart.map(item => ({
-                    id: item.id,
-                    quantity: item.quantity,
-                    price: item.price
-                })),
+                items: transformedItems,
                 total_items: cart.length,
-                total_amount: subtotal,
-                discount_type: discountType,
+                total_amount: total,
                 discount_amount: discount,
                 tax_amount: tax,
-                final_total: total,
-                paid_amount: total,
                 payment_method: selectedPaymentMethod,
                 _token: $('meta[name="csrf-token"]').attr('content')
             };
@@ -1161,42 +1424,52 @@
             $('#checkout-btn').prop('disabled', true);
 
             $.ajax({
-                url: '{{ route("pos.checkout") }}',
+                url: '/pos/checkout',
                 method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 data: orderData,
                 success: function(response) {
+                    console.log('Checkout response:', response);
                     if (response.success) {
+                        // Generate receipt from current cart data
+                        const receiptData = {
+                            sale_id: response.sale_id || 'N/A',
+                            date: new Date().toLocaleString(),
+                            customer: $('#customer-select option:selected').text() || 'Walk-in Customer',
+                            items: cart,
+                            subtotal: cart.reduce((sum, item) => sum + item.total, 0),
+                            discount: discountValue > 0 ? (discountType === 'percentage' ? 
+                                (cart.reduce((sum, item) => sum + item.total, 0) * discountValue) / 100 : discountValue) : 0,
+                            tax: 0,
+                            total: total,
+                            payment_method: selectedPaymentMethod
+                        };
+                        receiptData.tax = (receiptData.subtotal - receiptData.discount) * 0.10;
+                        
+                        showReceipt(receiptData);
+                    } else {
                         Swal.fire({
-                            icon: 'success',
-                            title: 'Sale Completed!',
-                            text: response.message,
-                            confirmButtonText: 'Print Receipt'
-                        }).then((result) => {
-                            // Reset cart
-                            cart = [];
-                            updateCartDisplay();
-                            calculateTotals();
-                            
-                            // Reset form
-                            $('#customer-select').val('');
-                            $('#discount-value').val('');
-                            discountValue = 0;
-                            
-                            if (result.isConfirmed && response.redirect) {
-                                window.open(response.redirect, '_blank');
-                            }
+                            icon: 'error',
+                            title: 'Checkout Failed',
+                            text: response.message || 'Please try again.'
                         });
                     }
                 },
                 error: function(xhr) {
+                    let errorMessage = 'Please try again or contact support.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
                     Swal.fire({
                         icon: 'error',
                         title: 'Checkout Failed',
-                        text: 'Please try again or contact support.'
+                        text: errorMessage
                     });
                 },
                 complete: function() {
-                    $('#checkout-btn').html('<i class="fas fa-check-circle"></i> Complete Sale');
+                    $('#checkout-btn').html('<i class="fas fa-credit-card"></i> Process Payment');
                     $('#checkout-btn').prop('disabled', false);
                 }
             });

@@ -34,54 +34,10 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
-
-        $loggedInUser = Auth::user();
-        if ($loggedInUser->is_verified == 1) {
-            if ($loggedInUser->userSettings && $loggedInUser->userSettings->two_fa_type == 'email') {
-                $otp_code = random_int(100000, 999999);
-                $otp = [
-                    'email_otpCode' => $otp_code,
-                ];
-                // Send Email Verification OTP
-                Mail::to($loggedInUser->email)->send(new EmailVerification($otp));
-                User::where('email', Auth::user()->email)->update([
-                    'email_otp' => $otp_code,
-                ]);
-                Session::put('user_email', $loggedInUser->email);
-                Session::put('user_phone', $loggedInUser->phone_number);
-                Auth::logout();
-                return redirect()->route('two.fa.verification')->with('success', 'Verification Page');
-            } else if ($loggedInUser->userSettings && $loggedInUser->userSettings->two_fa_type == 'phone') {
-                // Send Phone Number Verification OTP
-                $otpmobilecode = mt_rand(1000, 9999);
-                $to = $loggedInUser->phone_number;
-
-                // Use Twilio to send the OTP
-                $twilio = new Client(config('services.twilio.account_sid'), config('services.twilio.auth_token'));
-                $twilio->messages->create(
-                    '+' . $to,
-                    [
-                        'from' => config('services.twilio.from'),
-                        'body' => "Your 2 FA otp for login is: $otpmobilecode",
-                    ]
-                );
-                Session::put('user_email', $loggedInUser->email);
-                Session::put('user_phone', $loggedInUser->phone_number);
-                User::where('email', Auth::user()->email)->update([
-                    'phone_otp' => $otpmobilecode,
-                ]);
-                Auth::logout();
-                return redirect()->route('two.fa.phone.verification')->with('success', 'Otp is sent to your mobile number. Please enter otp here!');
-            }
-            return redirect()->intended(RouteServiceProvider::HOME)->with('success', 'Login Successfully!');
-        } else {
-            Auth::login($loggedInUser);
-            return redirect()->route('email.verification.notice')->with('error', 'Your email is not verified. Please verify your email first');
-            // return redirect()->route('verification.notice')->with('error', 'Your email is not verified. Please verify your email first');
-        }
-        return redirect()->intended(RouteServiceProvider::HOME)->with('success', 'Login Successfully!');
+        
+        // Simple redirect to dashboard
+        return redirect()->route('dashboard')->with('success', 'Login Successfully!');
     }
 
     public function storeWithPreviousCode(LoginRequest $request): RedirectResponse

@@ -34,7 +34,7 @@ class Brand extends Model
                 return;
             }
             
-            if (\Schema::hasColumn('brands', 'created_by')) {
+            if (config('app.has_created_by_column', true)) {
                 $allowedIds = session('data_scope_user_ids', [$user->id]);
                 $builder->whereIn('created_by', $allowedIds);
             }

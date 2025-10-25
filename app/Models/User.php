@@ -7,11 +7,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Cashier\Billable;
-use Spatie\Permission\Traits\HasRoles; // 👈 Add this
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use Billable, HasApiTokens, HasFactory, Notifiable, HasRoles; // 👈 Add HasRoles here
+    use Billable, HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
         'name',
@@ -26,7 +26,8 @@ class User extends Authenticatable
         'approved_by',
         'approved_at',
         'rejection_reason',
-        'created_by'
+        'created_by',
+        'role'
     ];
 
     protected $hidden = [
@@ -36,7 +37,6 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
         'last_login' => 'datetime',
     ];
 
@@ -59,5 +59,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(User::class, 'created_by');
     }
-
+    
+    public function sales()
+    {
+        return $this->hasMany(Sale::class);
+    }
 }

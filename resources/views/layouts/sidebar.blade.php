@@ -86,8 +86,8 @@
         </li>
         @endif
 
-        <!-- Business Sections - Hidden from Super Admin -->
-        @if(!auth()->user()->hasRole('super_admin'))
+        <!-- Business Sections - For Admin and Sellers -->
+        @if(auth()->user()->hasRole(['admin', 'seller', 'manager', 'sales']))
         
         <!-- Brands Section -->
         <li class="nav-item">
@@ -299,127 +299,78 @@
             </div>
         </li>
 
-        @endif
-
-    </ul>
-</nav>    <i class="menu-arrow"></i>
+        <!-- TEST NEW FEATURE -->
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="typcn typcn-star menu-icon"></i>
+                <span class="menu-title">🚀 NEW FEATURE TEST</span>
             </a>
-            <div class="collapse" id="sales-menu">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('admin.sales.index') }}">All Sales</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('admin.sales.create') }}">Add Sale</a></li>
-                </ul>
-            </div>
         </li>
 
-        <!-- Purchase Section -->
+        <!-- Financial Management -->
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#purchase-basic" aria-expanded="false" aria-controls="purchase-basic">
-                <i class="typcn typcn-shopping-cart menu-icon"></i>
-                <span class="menu-title">Purchases</span>
-                <i class="typcn typcn-chevron-right menu-arrow"></i>
-            </a>
-            <div class="collapse" id="purchase-basic">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.purchases.index') }}">Purchase Listing</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.purchases.create') }}">Create Purchase</a>
-                    </li>
-                </ul>
-            </div>
-        </li>
-
-        <!-- Reports Section -->
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#reports-menu" aria-expanded="false" aria-controls="reports-menu">
-                <i class="typcn typcn-chart-line menu-icon"></i>
-                <span class="menu-title">Reports</span>
+            <a class="nav-link" data-toggle="collapse" href="#financial-menu" aria-expanded="false" aria-controls="financial-menu">
+                <i class="typcn typcn-calculator menu-icon"></i>
+                <span class="menu-title">Financial <span class="badge badge-success ml-2">New</span></span>
                 <i class="menu-arrow"></i>
             </a>
-            <div class="collapse" id="reports-menu">
+            <div class="collapse" id="financial-menu">
                 <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('reports.index') }}">Reports Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('reports.sales') }}">Sales Reports</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('reports.products') }}">Products Report</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('reports.customers') }}">Customers Report</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('financial.chart-of-accounts') }}">Chart of Accounts</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('financial.journal-entries') }}">Journal Entries</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('financial.balance-sheet') }}">Balance Sheet</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('financial.profit-loss') }}">P&L Statement</a></li>
                 </ul>
             </div>
         </li>
 
-        <!-- POS Settings -->
+        <!-- Advanced Inventory -->
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('pos-settings.index') }}">
-                <i class="typcn typcn-cog menu-icon"></i>
-                <span class="menu-title">POS Settings</span>
-            </a>
-        </li>
-
-        <!-- Notifications Section -->
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('notifications.index') }}">
-                <i class="typcn typcn-bell menu-icon"></i>
-                <span class="menu-title">Notifications</span>
-                <span class="badge badge-danger ml-2" id="sidebar-notification-count" style="display: none;">0</span>
-            </a>
-        </li>
-
-        <!-- Expenses Category Section -->
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#expense-category-menu" aria-expanded="false" aria-controls="expense-category-menu">
-                <i class="typcn typcn-folder menu-icon"></i>
-                <span class="menu-title">Expense Categories</span>
+            <a class="nav-link" data-toggle="collapse" href="#inventory-menu" aria-expanded="false" aria-controls="inventory-menu">
+                <i class="typcn typcn-archive menu-icon"></i>
+                <span class="menu-title">Advanced Inventory <span class="badge badge-success ml-2">New</span></span>
                 <i class="menu-arrow"></i>
             </a>
-            <div class="collapse" id="expense-category-menu">
+            <div class="collapse" id="inventory-menu">
                 <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('expense-categories') }}">All Expense Categories</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('expense-categories.create') }}">Add Expense Category</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('inventory.stock-transfers') }}">Stock Transfers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('inventory.stock-adjustments') }}">Stock Adjustments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('inventory.low-stock-alerts') }}">Low Stock Alerts</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('inventory.inventory-valuation') }}">Inventory Valuation</a></li>
                 </ul>
             </div>
         </li>
 
-        <!-- Expenses Section -->
+        <!-- CRM & Loyalty -->
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#expenses-menu" aria-expanded="false" aria-controls="expenses-menu">
-                <i class="typcn typcn-credit-card menu-icon"></i>
-                <span class="menu-title">Expenses</span>
+            <a class="nav-link" data-toggle="collapse" href="#crm-menu" aria-expanded="false" aria-controls="crm-menu">
+                <i class="typcn typcn-heart menu-icon"></i>
+                <span class="menu-title">CRM & Loyalty <span class="badge badge-success ml-2">New</span></span>
                 <i class="menu-arrow"></i>
             </a>
-            <div class="collapse" id="expenses-menu">
+            <div class="collapse" id="crm-menu">
                 <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('expenses') }}">All Expenses</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('expenses.create') }}">Add Expense</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('crm.loyalty-programs') }}">Loyalty Programs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('crm.customer-points') }}">Customer Points</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('crm.rewards') }}">Rewards</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('crm.customer-analytics') }}">Customer Analytics</a></li>
                 </ul>
             </div>
         </li>
 
-        <!-- Barcode Management Section -->
+        <!-- Business Intelligence -->
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#barcode-menu" aria-expanded="false" aria-controls="barcode-menu">
-                <i class="fas fa-barcode menu-icon"></i>
-                <span class="menu-title">Barcodes</span>
+            <a class="nav-link" data-toggle="collapse" href="#bi-menu" aria-expanded="false" aria-controls="bi-menu">
+                <i class="typcn typcn-chart-pie menu-icon"></i>
+                <span class="menu-title">Business Intelligence <span class="badge badge-success ml-2">New</span></span>
                 <i class="menu-arrow"></i>
             </a>
-            <div class="collapse" id="barcode-menu">
+            <div class="collapse" id="bi-menu">
                 <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('barcodes.generate') }}">Generate Barcode</a></li>
-                </ul>
-            </div>
-        </li>
-
-        <!-- Quotations Section -->
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#quotation-basic" aria-expanded="false" aria-controls="quotation-basic">
-                <i class="typcn typcn-document-text menu-icon"></i>
-                <span class="menu-title">Quotations</span>
-                <i class="typcn typcn-chevron-right menu-arrow"></i>
-            </a>
-            <div class="collapse" id="quotation-basic">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('quotations') }}">Quotation Listing</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('quotations.create') }}">Create Quotation</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('bi.analytics-dashboard') }}">Analytics Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('bi.sales-forecasting') }}">Sales Forecasting</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('bi.performance-metrics') }}">Performance Metrics</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('bi.custom-reports') }}">Custom Reports</a></li>
                 </ul>
             </div>
         </li>

@@ -155,6 +155,63 @@
         </div>
     </div>
 </div>
+
+<!-- New Enterprise Features Section -->
+@if(auth()->user()->role !== 'super_admin')
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h4 class="mb-3">🚀 New Enterprise Features</h4>
+    </div>
+    
+    <!-- Financial Management -->
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card card-3d bg-gradient-primary">
+            <div class="card-body text-center">
+                <i class="typcn typcn-calculator" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-2">Financial Management</h5>
+                <p class="card-text">Complete accounting system with P&L, Balance Sheet</p>
+                <span class="badge badge-light">New</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Advanced Inventory -->
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card card-3d bg-gradient-info">
+            <div class="card-body text-center">
+                <i class="typcn typcn-archive" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-2">Advanced Inventory</h5>
+                <p class="card-text">Stock transfers, adjustments, valuation</p>
+                <span class="badge badge-light">New</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CRM & Loyalty -->
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card card-3d bg-gradient-success">
+            <div class="card-body text-center">
+                <i class="typcn typcn-heart" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-2">CRM & Loyalty</h5>
+                <p class="card-text">Customer loyalty programs and rewards</p>
+                <span class="badge badge-light">New</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Business Intelligence -->
+    <div class="col-md-3 grid-margin stretch-card">
+        <div class="card card-3d bg-gradient-warning">
+            <div class="card-body text-center">
+                <i class="typcn typcn-chart-pie" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-2">Business Intelligence</h5>
+                <p class="card-text">Advanced analytics and forecasting</p>
+                <span class="badge badge-light">New</span>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @endsection
 
 @push('scripts')

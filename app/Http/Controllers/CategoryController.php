@@ -98,6 +98,6 @@ class CategoryController extends Controller
         $this->sendNotificationToAll(CategoryDeleteNotification::class, $category);
         $category->delete();
 
-        return redirect()->route('categories')->with('error', 'Category deleted successfully!');
+        return redirect()->route('categories')->with('success', 'Category deleted successfully!');
     }
 }

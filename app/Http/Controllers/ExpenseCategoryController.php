@@ -52,7 +52,7 @@ class ExpenseCategoryController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $category = ExpenseCategory::create($request->all());
+        $category = ExpenseCategory::create($request->only(['name', 'description']));
 
         $category->notify(new ExpenseCategoryCreateNotification($category));
 
@@ -74,7 +74,7 @@ class ExpenseCategoryController extends Controller
         ]);
 
         $category = ExpenseCategory::findOrFail($request->id);
-        $category->update($request->all());
+        $category->update($request->only(['name', 'description']));
 
         $category->notify(new ExpenseCategoryUpdateNotification($category));
 
@@ -90,8 +90,9 @@ class ExpenseCategoryController extends Controller
         $category = ExpenseCategory::findOrFail($id);
 
         $category->notify(new ExpenseCategoryDeleteNotification($category));
+        
         $category->delete();
 
-        return redirect()->route('expense-categories')->with('error', 'Expense Category deleted successfully!');
+        return redirect()->route('expense-categories')->with('success', 'Expense Category deleted successfully!');
     }
 }

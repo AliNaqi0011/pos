@@ -2,11 +2,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 
 class Category extends Model
 {
-    use Notifiable;  // Add this line
+    use HasFactory, Notifiable;  // Add this line
 
     protected $fillable = ['name', 'description', 'parent_id', 'created_by'];
 
@@ -25,11 +26,11 @@ class Category extends Model
             }
             
             if ($user->hasRole('super_admin')) {
-                $builder->whereRaw('1 = 0');
+                $builder->whereRaw('1 = 0'); // Super admin manages system, not categories
                 return;
             }
             
-            if (\Schema::hasColumn('categories', 'created_by')) {
+            if (config('app.has_created_by_column', true)) {
                 $allowedIds = session('data_scope_user_ids', [$user->id]);
                 $builder->whereIn('created_by', $allowedIds);
             }

@@ -24,16 +24,20 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:customers,email',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
         ]);
 
-        $customer = Customer::create($request->only('name', 'email', 'phone', 'address'));
+        $customer = Customer::create($validated);
 
-        $customer->notify(new CustomerCreateNotification($customer));
+        try {
+            \Notification::send(\App\Models\User::all(), new CustomerCreateNotification($customer));
+        } catch (\Exception $e) {
+            \Log::warning('Failed to send customer notification: ' . $e->getMessage());
+        }
 
         return redirect()->route('customers')->with('success', 'Customer created successfully!');
     }
@@ -62,12 +66,18 @@ class CustomerController extends Controller
         return redirect()->route('customers')->with('success', 'Customer updated successfully!');
     }
 
-    public function delete($id)
+    public function destroy($id)
     {
         $customer = Customer::findOrFail($id);
-        $customer->notify(new CustomerDeleteNotification($customer));
+        
+        try {
+            $customer->notify(new CustomerDeleteNotification($customer));
+        } catch (\Exception $e) {
+            \Log::warning('Failed to send customer delete notification: ' . $e->getMessage());
+        }
+        
         $customer->delete();
 
-        return redirect()->route('customers')->with('error', 'Customer deleted successfully!');
+        return redirect()->route('customers')->with('success', 'Customer deleted successfully!');
     }
 }

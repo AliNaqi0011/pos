@@ -20,10 +20,10 @@ class SuperAdminSeeder extends Seeder
             'email_verified_at' => now(),
             'status' => 'approved',
             'payment_verified' => true,
+            'role' => 'super_admin',
         ]);
 
-        $superAdmin->assignRole('super_admin');
-
+        // Create an admin user created by super admin
         $admin = User::firstOrCreate([
             'email' => 'admin@example.com'
         ], [
@@ -34,10 +34,11 @@ class SuperAdminSeeder extends Seeder
             'email_verified_at' => now(),
             'status' => 'approved',
             'payment_verified' => true,
+            'role' => 'admin',
+            'created_by' => $superAdmin->id,
         ]);
 
-        $admin->assignRole('admin');
-
+        // Create a seller user created by admin
         $seller = User::firstOrCreate([
             'email' => 'seller@example.com'
         ], [
@@ -48,8 +49,8 @@ class SuperAdminSeeder extends Seeder
             'email_verified_at' => now(),
             'status' => 'approved',
             'payment_verified' => true,
+            'role' => 'seller',
+            'created_by' => $admin->id,
         ]);
-
-        $seller->assignRole('seller');
     }
 }

@@ -2,78 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sale;
-use App\Models\Purchase;
-use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Models\Sale;
+use App\Models\SaleReturn;
+use App\Models\Purchase;
+use App\Models\PurchaseReturn;
+use App\Models\Product;
 
 class TestController extends Controller
 {
     public function testSalesReturns()
     {
-        // Test sales with returns functionality
-        $sales = Sale::with(['saleItems.product', 'customer', 'returns'])->get();
-        
-        $data = [];
-        foreach ($sales as $sale) {
-            $data[] = [
-                'sale_id' => $sale->id,
-                'customer' => $sale->customer->name ?? 'N/A',
-                'total_items' => $sale->saleItems->count(),
-                'total_amount' => $sale->final_total,
-                'returns_count' => $sale->returns->count(),
-                'status' => $sale->status
-            ];
-        }
-        
-        return response()->json([
-            'message' => 'Sales and Returns Test',
-            'sales_data' => $data
-        ]);
+        $salesReturns = SaleReturn::with(['sale', 'items.product'])->get();
+        return response()->json(['sales_returns' => $salesReturns]);
     }
-    
+
     public function testPurchasesReturns()
     {
-        // Test purchases with returns functionality
-        $purchases = Purchase::with(['items.product', 'warehouse', 'returns'])->get();
-        
-        $data = [];
-        foreach ($purchases as $purchase) {
-            $data[] = [
-                'purchase_id' => $purchase->id,
-                'warehouse' => $purchase->warehouse->name ?? 'N/A',
-                'total_items' => $purchase->items->count(),
-                'grand_total' => $purchase->grand_total,
-                'returns_count' => $purchase->returns->count(),
-                'status' => $purchase->status
-            ];
-        }
-        
-        return response()->json([
-            'message' => 'Purchases and Returns Test',
-            'purchases_data' => $data
-        ]);
+        $purchaseReturns = PurchaseReturn::with(['purchase', 'items.product'])->get();
+        return response()->json(['purchase_returns' => $purchaseReturns]);
     }
-    
+
     public function testProductStock()
     {
-        // Test product stock levels
-        $products = Product::all();
-        
-        $data = [];
-        foreach ($products as $product) {
-            $data[] = [
-                'product_id' => $product->id,
-                'name' => $product->name,
-                'current_stock' => $product->quantity,
-                'sale_price' => $product->sale_price,
-                'cost_price' => $product->cost_price
-            ];
-        }
-        
-        return response()->json([
-            'message' => 'Product Stock Test',
-            'products_data' => $data
-        ]);
+        $products = Product::select('id', 'name', 'quantity')->get();
+        return response()->json(['products' => $products]);
     }
 }

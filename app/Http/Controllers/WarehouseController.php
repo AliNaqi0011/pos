@@ -81,6 +81,6 @@ class WarehouseController extends Controller
 
         $warehouse->delete();
 
-        return redirect()->route('warehouses')->with('error', 'Warehouse deleted successfully!');
+        return redirect()->route('warehouses')->with('success', 'Warehouse deleted successfully!');
     }
 }

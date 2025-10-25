@@ -10,13 +10,13 @@
         <ul class="navbar-nav mr-lg-2">
             
             <li class="nav-item d-none d-lg-flex">
-    <a class="nav-link" href="{{ url('/pos') }}">
+    <a class="nav-link" href="/pos">
         <i class="typcn typcn-device-desktop menu-icon"></i>
         <span class="menu-title"><b>POS</b></span>
     </a>
 </li>
 
-@if(auth()->user()->hasRole('admin'))
+@if(auth()->user()->role === 'admin')
 <li class="nav-item d-none d-lg-flex">
     <a class="nav-link" href="{{ route('admin.project.settings.index') }}">
         <i class="typcn typcn-cog menu-icon"></i>
@@ -101,7 +101,7 @@
                         </div>
                     </div>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item text-center" href="{{ route('notifications.index') }}">
+                    <a class="dropdown-item text-center" href="#">
                         <small>View All Notifications</small>
                     </a>
                 </div>

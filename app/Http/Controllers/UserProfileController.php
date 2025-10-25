@@ -46,8 +46,19 @@ class UserProfileController extends Controller
         }
 
         if ($request->profile_image) {
-            $image = $request->profile_image;;
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $request->validate([
+                'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            ]);
+            
+            $image = $request->profile_image;
+            $allowedExtensions = ['jpeg', 'jpg', 'png', 'gif'];
+            $extension = strtolower($image->getClientOriginalExtension());
+            
+            if (!in_array($extension, $allowedExtensions)) {
+                return redirect()->back()->with('error', 'Invalid file type. Only JPEG, PNG, JPG, and GIF are allowed.');
+            }
+            
+            $imageName = time() . '.' . $extension;
             $image->move(public_path('template/images/profile-images'), $imageName);
             $user->profile_image = $imageName;
         }

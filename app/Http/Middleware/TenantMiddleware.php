@@ -13,9 +13,9 @@ class TenantMiddleware
         if (Auth::check()) {
             $user = Auth::user();
             
-            // Set tenant context based on user's organization/company
+            // Set tenant context
             if ($user->tenant_id) {
-                config(['database.connections.tenant.database' => 'tenant_' . $user->tenant_id]);
+                config(['app.current_tenant_id' => $user->tenant_id]);
             }
         }
 

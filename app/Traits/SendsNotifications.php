@@ -12,8 +12,14 @@ trait SendsNotifications
      */
     protected function sendNotificationToAll($notificationClass, $data = null)
     {
-        $users = User::all();
-        Notification::send($users, new $notificationClass($data));
+        try {
+            $users = User::all();
+            if ($users->isNotEmpty()) {
+                Notification::send($users, new $notificationClass($data));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Notification sending failed: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -21,8 +27,16 @@ trait SendsNotifications
      */
     protected function sendNotificationToRoles($notificationClass, $roles, $data = null)
     {
-        $users = User::role($roles)->get();
-        Notification::send($users, new $notificationClass($data));
+        try {
+            $users = User::whereHas('roles', function($q) use ($roles) {
+                $q->whereIn('name', (array) $roles);
+            })->get();
+            if ($users->isNotEmpty()) {
+                Notification::send($users, new $notificationClass($data));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Role notification sending failed: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -30,7 +44,15 @@ trait SendsNotifications
      */
     protected function sendNotificationToAdmins($notificationClass, $data = null)
     {
-        $users = User::role(['super_admin', 'admin'])->get();
-        Notification::send($users, new $notificationClass($data));
+        try {
+            $users = User::whereHas('roles', function($q) {
+                $q->whereIn('name', ['super_admin', 'admin']);
+            })->get();
+            if ($users->isNotEmpty()) {
+                Notification::send($users, new $notificationClass($data));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Admin notification sending failed: ' . $e->getMessage());
+        }
     }
 }

@@ -20,8 +20,13 @@ class BlogController extends Controller
     }
 
     public function store(Request $request){
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|unique:blogs,slug|max:255',
+            'tags' => 'nullable|string',
+            'description' => 'nullable|string'
+        ]);
 
-        // Create a new Blog instance and fill it with validated data
         $blog = new Blogs();
         $blog->title = $request->title;
         $blog->meta_title = $request->title;
@@ -29,9 +34,7 @@ class BlogController extends Controller
         $blog->tags = $request->tags;
         $blog->meta_description = $request->description;
 
-        // Save the blog post
         $blog->save();
-
         $blog->notify(new BlogCreateNotification($blog));
         return redirect()->route('blog.listing')->with(['success' => 'Blog Added successfully!']);
     }

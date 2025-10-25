@@ -41,11 +41,17 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        try {
+            if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+                RateLimiter::hit($this->throttleKey());
 
+                throw ValidationException::withMessages([
+                    'email' => 'Database connection failed. Please check your database server.',
+                ]);
+            }
+        } catch (\Exception $e) {
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'Database connection error: ' . $e->getMessage(),
             ]);
         }
 

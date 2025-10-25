@@ -4,12 +4,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\Auditable;
 
-class Product extends Model
+class Product extends BaseModel
 {
-    use HasFactory;
+    use HasFactory, Auditable;
 
     // Define the fillable attributes
     protected $fillable = [
@@ -26,7 +26,8 @@ class Product extends Model
         'discount_price', 
         'stock_alert_level',
         'image',
-        'created_by'
+        'created_by',
+        'tenant_id'
     ];
 
     protected static function booted()
@@ -43,14 +44,14 @@ class Product extends Model
                 return;
             }
             
-            // Super admin cannot see any products - only manages users
+            // Super admin manages system, not products - redirect them
             if ($user->hasRole('super_admin')) {
-                $builder->whereRaw('1 = 0'); // No results
+                $builder->whereRaw('1 = 0'); // No products for super admin
                 return;
             }
             
             // Check if created_by column exists before applying scope
-            if (\Schema::hasColumn('products', 'created_by')) {
+            if (config('app.has_created_by_column', true)) {
                 $allowedIds = session('data_scope_user_ids', [$user->id]);
                 $builder->whereIn('created_by', $allowedIds);
             }
@@ -90,7 +91,7 @@ class Product extends Model
     // Helper method to check if the product is below the stock alert level
     public function isStockLow()
     {
-        return $this->quantity <= $this->stock_alert_level;
+        return $this->quantity <= ($this->stock_alert_level ?? 0);
     }
 
     // Scopes for more complex queries (optional but useful)
@@ -110,8 +111,19 @@ class Product extends Model
     }
 
     public function saleItems()
-{
-    return $this->hasMany(SaleItem::class);
-}
-    // Any other business logic related to product can go here
+    {
+        return $this->hasMany(SaleItem::class);
+    }
+    
+    public function decreaseStock(int $quantity): void
+    {
+        $this->quantity = max(0, $this->quantity - $quantity);
+        $this->save();
+    }
+    
+    public function increaseStock(int $quantity): void
+    {
+        $this->quantity += $quantity;
+        $this->save();
+    }
 }

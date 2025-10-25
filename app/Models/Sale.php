@@ -150,4 +150,9 @@ class Sale extends Model
         $this->paid_amount = array_sum(array_column($payments, 'amount'));
         $this->save();
     }
+    
+    public function getFinalTotalAttribute()
+    {
+        return $this->attributes['final_total'] ?? ($this->total_amount + $this->tax_amount - $this->discount_amount);
+    }
 }

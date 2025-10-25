@@ -36,12 +36,12 @@ class ProductController extends Controller
         $request->validate([
             'name'          => 'required|string|max:255',
             'category_id'   => 'required|exists:categories,id',
-            'brand_id'      => 'required|exists:brands,id',
+            'brand_id'      => 'nullable|exists:brands,id',
             'warehouse_id'  => 'nullable|exists:warehouses,id',
             'cost_price'    => 'nullable|numeric',
             'sale_price'    => 'nullable|numeric',
             'discount_price'=> 'nullable|numeric',
-            'quantity'      => 'required|integer',
+            'quantity'      => 'required|integer|min:0',
             'description'   => 'nullable|string',
             'barcode'       => 'nullable|string|unique:products,barcode',
             'image'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -123,26 +123,28 @@ class ProductController extends Controller
         return view('admin.products.edit', compact('product', 'categories', 'brands', 'warehouses'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id = null)
     {
+        $productId = $id ?? $request->id;
+        
         // Validation
-        $request->validate([
-            'id'            => 'required|exists:products,id',
+        $validated = $request->validate([
             'name'          => 'required|string|max:255',
             'category_id'   => 'required|exists:categories,id',
-            'brand_id'      => 'required|exists:brands,id',
+            'brand_id'      => 'nullable|exists:brands,id',
             'warehouse_id'  => 'nullable|exists:warehouses,id',
-            'price'         => 'required|numeric',
-            'cost_price'    => 'nullable|numeric',
-            'sale_price'    => 'nullable|numeric',
-            'discount_price'=> 'nullable|numeric',
-            'quantity'      => 'required|integer',
+            'price'         => 'nullable|numeric|min:0',
+            'cost_price'    => 'nullable|numeric|min:0',
+            'sale_price'    => 'nullable|numeric|min:0',
+            'discount_price'=> 'nullable|numeric|min:0',
+            'quantity'      => 'required|integer|min:0',
             'description'   => 'nullable|string',
-            'barcode'       => 'nullable|string|unique:products,barcode,' . $request->id,
+            'barcode'       => 'nullable|string|unique:products,barcode,' . $productId,
             'image'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $product = Product::findOrFail($request->id);
+        $product = Product::findOrFail($productId);
+        $imagePath = $product->image;
 
         if ($request->hasFile('image')) {
             // Delete old image if it exists
@@ -152,29 +154,32 @@ class ProductController extends Controller
 
             $image = $request->file('image');
             $filename = 'product_' . time() . '.' . $image->getClientOriginalExtension();
-            Storage::disk('public')->put("products/$filename", file_get_contents($image));
-            $product->image = "products/$filename";
+            $imagePath = $image->storeAs('products', $filename, 'public');
         }
 
         // Update the product
         $product->update([
-            'name'           => $request->name,
-            'category_id'    => $request->category_id,
-            'brand_id'       => $request->brand_id,
-            'warehouse_id'   => $request->warehouse_id,
-            'price'          => $request->price,
-            'cost_price'     => $request->cost_price,
-            'sale_price'     => $request->sale_price,
-            'discount_price' => $request->discount_price,
-            'quantity'       => $request->quantity,
-            'description'    => $request->description,
-            'barcode'        => $request->barcode,
-            'image'          => $product->image,
+            'name'           => $validated['name'],
+            'category_id'    => $validated['category_id'],
+            'brand_id'       => $validated['brand_id'],
+            'warehouse_id'   => $validated['warehouse_id'],
+            'price'          => $validated['price'] ?? $validated['sale_price'] ?? 0,
+            'cost_price'     => $validated['cost_price'],
+            'sale_price'     => $validated['sale_price'] ?? $validated['price'] ?? 0,
+            'discount_price' => isset($validated['discount_price']) ? $validated['discount_price'] : null,
+            'quantity'       => $validated['quantity'],
+            'description'    => $validated['description'],
+            'barcode'        => $validated['barcode'] ?? $product->barcode,
+            'image'          => $imagePath,
         ]);
         
         // Send notification to all users
-        $users = User::all();
-        Notification::send($users, new ProductUpdateNotification($product));
+        try {
+            $users = User::all();
+            Notification::send($users, new ProductUpdateNotification($product));
+        } catch (\Exception $e) {
+            \Log::warning('Failed to send product update notification: ' . $e->getMessage());
+        }
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully!');
     }
@@ -193,6 +198,6 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return redirect()->route('products.index')->with('error', 'Product deleted successfully!');
+        return redirect()->route('products.index')->with('success', 'Product deleted successfully!');
     }
 }

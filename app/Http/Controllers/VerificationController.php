@@ -60,7 +60,7 @@ class VerificationController extends Controller
         return view('admin.email-verify', compact('userPhone', 'userEmail'));
     }
 
-    public function VerifyEmaiLPhoneOtp(Request $request)
+    public function verifyEmailPhoneOtp(Request $request)
     {
         $userEmail = Session::get('user_email');
         $userPhone = Session::get('user_phone');
@@ -151,8 +151,18 @@ class VerificationController extends Controller
     }
 
     public function check_phone_verification(Request $request) {
+        $request->validate([
+            'phone_otp' => 'required|string',
+            'PhoneNumber' => 'required|string'
+        ]);
+        
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'User not authenticated'], 401);
+        }
+        
         $phone_otp = $request->phone_otp;
-        $user_phone_otp = Auth::user()->phone_otp;
+        $user_phone_otp = $user->phone_otp;
         if($user_phone_otp == $phone_otp) {
             User::where('id', Auth::user()->id)->update([
                 'phone_verified' => 1,
@@ -166,7 +176,7 @@ class VerificationController extends Controller
         } else {
             return response()->json([
                 'status' => false,
-                'message' => "Otp is in correct",
+                'message' => "OTP is incorrect",
                 'PhoneNumber' => $request->phone_number
             ], 200);
         }

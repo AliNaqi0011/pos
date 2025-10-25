@@ -12,37 +12,39 @@
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">User Create</h4>
+                        <h4 class="card-title">Create New {{ ucfirst($allowedRole) }}</h4>
+                        <div class="alert alert-info">
+                            <strong>Note:</strong> You are creating a new <strong>{{ ucfirst($allowedRole) }}</strong> user.
+                        </div>
                         <form class="forms-sample" action="{{route('users.store')}}" method="post">
                             @csrf
                             <div class="form-group">
-                                <label for="exampleInputUsername1">Name</label>
-                                <input type="text" name="name" class="form-control" id="exampleInputUsername1"
-                                    placeholder="Enter Name">
+                                <label for="name">Name</label>
+                                <input type="text" name="name" class="form-control" id="name"
+                                    placeholder="Enter Name" required>
                             </div>
                             <div class="form-group">
-                                <label for="exampleInputEmail1">Email address</label>
-                                <input type="email" name="email" class="form-control" id="exampleInputEmail1"
-                                    placeholder="Enter Email">
+                                <label for="email">Email address</label>
+                                <input type="email" name="email" class="form-control" id="email"
+                                    placeholder="Enter Email" required>
                             </div>
                             <div class="form-group">
-                                <label for="exampleInputUsername1">Phone Number</label>
-                                <input type="text" name="phone_number" class="form-control" id="exampleInputUsername1"
-                                    placeholder="Enter Phone">
+                                <label for="phone_number">Phone Number</label>
+                                <input type="text" name="phone_number" class="form-control" id="phone_number"
+                                    placeholder="Enter Phone" required>
                             </div>
                             <div class="form-group">
-                                <label for="exampleInputPassword1">Password</label>
-                                <input type="password" name="password" class="form-control" id="exampleInputPassword1"
-                                    placeholder="Password">
+                                <label for="password">Password</label>
+                                <input type="password" name="password" class="form-control" id="password"
+                                    placeholder="Password" required>
                             </div>
-                            <div class="form-check form-check-flat form-check-primary">
-                                <label class="form-check-label">
-                                    <input type="checkbox" class="form-check-input">
-                                    Remember me
-                                </label>
+                            <div class="form-group">
+                                <label>Role</label>
+                                <input type="text" class="form-control" value="{{ ucfirst($allowedRole) }}" readonly>
+                                <small class="text-muted">Role is automatically assigned based on your permissions.</small>
                             </div>
-                            <button type="submit" class="btn btn-primary mr-2">Submit</button>
-                            <button class="btn btn-light">Reset Form</button>
+                            <button type="submit" class="btn btn-primary mr-2">Create {{ ucfirst($allowedRole) }}</button>
+                            <a href="{{ route('users') }}" class="btn btn-light">Cancel</a>
                         </form>
                     </div>
                 </div>

@@ -11,44 +11,40 @@ use App\Models\Brand;
 use App\Models\Warehouse;
 use App\Models\Customer;
 use App\Models\User;
+// Services will be loaded dynamically if available
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\SaleCreateNotification;
+use Illuminate\Validation\Rule;
 
 class POSController extends Controller
 {
+    private $cartService;
+
+    public function __construct()
+    {
+        // Initialize services only if they exist
+        if (class_exists('App\Services\CartService')) {
+            $this->cartService = app('App\Services\CartService');
+        }
+    }
+
     public function index()
     {
-        $categories = Category::all();
-        $brands = Brand::all();
-        $warehouses = Warehouse::all();
-        $products = Product::all();
-        $customers = Customer::all();
+        try {
+            $categories = Category::select('id', 'name')->get() ?? collect();
+            $brands = Brand::select('id', 'name')->get() ?? collect();
+            $warehouses = Warehouse::select('id', 'name')->get() ?? collect();
+            $products = Product::select('id', 'name', 'sale_price', 'quantity', 'category_id', 'brand_id')->get() ?? collect();
+            $customers = Customer::select('id', 'name', 'email')->get() ?? collect();
 
-        if (!Session::has('sale_id')) {
-            $defaultCustomer = Customer::withoutGlobalScopes()->firstOrCreate(
-                ['email' => 'walkin@customer.com'],
-                ['name' => 'Walk-in Customer', 'phone' => '0000000000']
-            );
-
-            $sale = Sale::create([
-                'customer_id' => $defaultCustomer->id,
-                'user_id' => Auth::id(),
-                'total_items' => 0,
-                'total_amount' => 0.00,
-                'final_total' => 0.00,
-                'status' => Sale::STATUS_DRAFT,
-                'payment_status' => Sale::PAYMENT_STATUS_UNPAID,
-                'sale_date' => now(),
-            ]);
-            Session::put('sale_id', $sale->id);
-            Log::info('Sale initialized in session with ID: ' . $sale->id);
+            return view('admin.pos.infy-pos', compact('categories', 'brands', 'warehouses', 'products', 'customers'));
+        } catch (\Exception $e) {
+            \Log::error('POS Index Error: ' . $e->getMessage());
+            return redirect('/dashboard')->with('error', 'POS system temporarily unavailable. Please try again.');
         }
-
-        return view('admin.pos.infy-pos', compact('categories', 'brands', 'warehouses', 'products', 'customers'));
     }
 
     public function filterProducts(Request $request)
@@ -73,185 +69,170 @@ class POSController extends Controller
 
     public function addToCart(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
+        $productId = $request->input('product_id') ?: $request->input('id');
+        
+        $validated = $request->validate([
+            'quantity' => ['required', 'integer', 'min:1', 'max:1000'],
         ]);
-    
-        $product = Product::find($request->product_id);
-        $quantity = $request->quantity;
-        $total = $product->sale_price * $quantity;
-    
-        // Check stock availability before adding to cart
-        if ($product->quantity < $quantity) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Insufficient stock. Available: ' . $product->quantity
-            ], 400);
+        
+        $product = Product::find($productId);
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 400);
         }
-    
-        $saleId = session()->get('sale_id');
-    
-        if (!$saleId) {
-            $defaultCustomer = Customer::withoutGlobalScopes()->firstOrCreate(
-                ['email' => 'walkin@customer.com'],
-                ['name' => 'Walk-in Customer', 'phone' => '0000000000']
-            );
-    
-            $sale = Sale::create([
-                'customer_id' => $defaultCustomer->id,
-                'user_id' => Auth::id(),
-                'total_items' => 0,
-                'total_amount' => 0.00,
-                'final_total' => 0.00,
-                'status' => Sale::STATUS_DRAFT,
-                'payment_status' => Sale::PAYMENT_STATUS_UNPAID,
-                'sale_date' => now(),
-            ]);
-    
-            session()->put('sale_id', $sale->id);
-            $saleId = $sale->id;
+        
+        if ($product->quantity < $validated['quantity']) {
+            return response()->json(['success' => false, 'message' => "Insufficient stock. Available: {$product->quantity}"], 400);
         }
-    
-        // Check if item already exists in cart
-        $existingItem = SaleItem::where('sale_id', $saleId)
-                                ->where('product_id', $product->id)
-                                ->first();
-    
-        if ($existingItem) {
-            $existingItem->quantity += $quantity;
-            $existingItem->total = $existingItem->quantity * $existingItem->product_price;
-            $existingItem->save();
-            $cartItem = $existingItem;
-        } else {
-            $cartItem = SaleItem::create([
-                'sale_id' => $saleId,
-                'product_id' => $product->id,
-                'product_price' => $product->sale_price,
-                'quantity' => $quantity,
-                'total' => $total,
-            ]);
-        }
-    
-        // Update sale totals
-        $sale = Sale::find($saleId);
-        $sale->total_items = SaleItem::where('sale_id', $saleId)->count();
-        $sale->total_amount = SaleItem::where('sale_id', $saleId)->sum('total');
-        $sale->final_total = $sale->total_amount;
-        $sale->save();
-    
-        return response()->json([
-            'success' => true,
-            'message' => 'Product added to cart',
-            'cartItem' => $cartItem,
-        ]);
+
+        return response()->json(['success' => true, 'message' => 'Product added to cart']);
     }
     
 
     public function checkout(Request $request)
     {
         try {
-            Log::info('Checkout initiated', $request->all());
-
-            $request->validate([
-                'total_items' => 'required|integer|min:1',
-                'total_amount' => 'required|numeric',
-                'final_total' => 'required|numeric',
+            // Validate request - STRICT customer validation to prevent auto-creation
+            $validated = $request->validate([
                 'items' => 'required|array|min:1',
-                'items.*.id' => 'required|integer',
+                'items.*.product_id' => 'required|exists:products,id',
                 'items.*.quantity' => 'required|integer|min:1',
                 'items.*.price' => 'required|numeric|min:0',
-            ]);
-
-        // Always ensure walk-in customer exists and use it if no customer selected
-        $walkInCustomer = Customer::withoutGlobalScopes()->firstOrCreate(
-            ['email' => 'walkin@customer.com'],
-            ['name' => 'Walk-in Customer', 'phone' => '0000000000']
-        );
-        
-        $customerId = $request->customer_id ?: $walkInCustomer->id;
-
-        $sale = Sale::create([
-            'user_id'           => auth()->id(),
-            'customer_id'       => $customerId,
-            'sale_date'         => now(),
-            'total_items'       => $request->total_items,
-            'total_amount'      => $request->total_amount,
-            'discount_type'     => $request->discount_type,
-            'discount_amount'   => $request->discount_amount ?? 0,
-            'tax_amount'        => $request->tax_amount ?? 0,
-            'final_total'       => $request->final_total,
-            'paid_amount'       => $request->paid_amount ?? $request->final_total,
-            'status'            => 'final',
-            'payment_status'    => 'paid',
-        ]);
-
-        foreach ($request->items as $item) {
-            $price = $item['price'];
-            $quantity = $item['quantity'];
-            $total = $price * $quantity;
-        
-            SaleItem::create([
-                'sale_id'       => $sale->id,
-                'product_id'    => $item['id'],
-                'product_price' => $price,
-                'quantity'      => $quantity,
-                'total'         => $total,
+                'customer_id' => 'nullable|exists:customers,id',
+                'total_amount' => 'required|numeric|min:0',
+                'payment_method' => 'required|string|in:cash,card,bank_transfer,mobile'
             ]);
             
-            // Update product stock - only deduct once during checkout
-            $product = Product::withoutGlobalScopes()->find($item['id']);
-            if ($product && $product->quantity >= $quantity) {
-                $product->decrement('quantity', $quantity);
-                Log::info("Stock updated for product {$item['id']}: -{$quantity}, remaining: {$product->fresh()->quantity}");
+            $items = $validated['items'];
+            
+            // STRICT customer handling - only existing customers or null (walk-in)
+            $customerId = null;
+            if (!empty($validated['customer_id']) && 
+                $validated['customer_id'] !== 'null' && 
+                $validated['customer_id'] !== '0' && 
+                $validated['customer_id'] !== '' &&
+                is_numeric($validated['customer_id'])) {
+                
+                // Double-check customer exists in database
+                $customer = Customer::find($validated['customer_id']);
+                if (!$customer) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Selected customer not found. Please select a valid customer or use walk-in option.'
+                    ], 400);
+                }
+                $customerId = $customer->id;
             }
-        }
-    
+            
+            // Log for debugging - remove in production
+            \Log::info('POS Checkout - Customer ID processed', [
+                'original_customer_id' => $validated['customer_id'] ?? 'null',
+                'processed_customer_id' => $customerId,
+                'customer_exists' => $customerId ? Customer::find($customerId) !== null : 'walk-in',
+                'total_customers_before' => Customer::count()
+            ]);
+            $totalAmount = $validated['total_amount'];
+            $paymentMethod = $validated['payment_method'];
+            
+            // Check stock availability
+            foreach ($items as $item) {
+                $product = Product::find($item['product_id']);
+                if (!$product || $product->quantity < $item['quantity']) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Insufficient stock for product: " . ($product ? $product->name : 'Unknown') . ". Available: " . ($product ? $product->quantity : 0)
+                    ], 400);
+                }
+            }
 
-        // Create payment record
-        $paidAmount = $request->paid_amount ?? $request->final_total;
-        if ($paidAmount > 0) {
+            \DB::beginTransaction();
+
+            // Create sale record
+            $sale = Sale::create([
+                'user_id' => Auth::id(),
+                'customer_id' => $customerId,
+                'sale_date' => now(),
+                'total_items' => count($items),
+                'total_amount' => $totalAmount,
+                'discount_amount' => $request->input('discount_amount', 0),
+                'tax_amount' => $request->input('tax_amount', 0),
+                'final_total' => $totalAmount,
+                'paid_amount' => $totalAmount,
+                'status' => 'final',
+                'payment_status' => 'paid',
+            ]);
+
+            // Create sale items and update stock
+            $receiptItems = [];
+            foreach ($items as $item) {
+                $product = Product::find($item['product_id']);
+                
+                SaleItem::create([
+                    'sale_id' => $sale->id,
+                    'product_id' => $item['product_id'],
+                    'product_price' => $item['price'],
+                    'quantity' => $item['quantity'],
+                    'total' => $item['price'] * $item['quantity'],
+                ]);
+                
+                // Update product stock
+                $product->quantity -= $item['quantity'];
+                $product->save();
+                
+                $receiptItems[] = [
+                    'product_id' => $item['product_id'],
+                    'product_name' => $product->name,
+                    'price' => $item['price'],
+                    'quantity' => $item['quantity'],
+                    'total' => $item['price'] * $item['quantity']
+                ];
+            }
+
+            // Create payment record
             SalePayment::create([
                 'sale_id' => $sale->id,
-                'amount' => $paidAmount,
-                'payment_method' => $request->payment_method ?? 'cash',
+                'amount' => $totalAmount,
+                'payment_method' => $paymentMethod,
                 'payment_date' => now(),
                 'notes' => 'POS checkout payment',
             ]);
-        }
 
-        // Send notification to all users
-        $users = User::all();
-        Notification::send($users, new SaleCreateNotification($sale));
-        
-        // Submit to FBR if enabled
-        $fbrService = new \App\Services\FBRService();
-        if ($fbrService->isEnabled()) {
-            $saleWithRelations = $sale->load('customer', 'items.product');
-            $fbrResult = $fbrService->submitInvoice($saleWithRelations->toArray());
+            \DB::commit();
             
-            if (!$fbrResult['success']) {
-                Log::warning('FBR submission failed for sale: ' . $sale->id, $fbrResult);
-            }
-        }
-        
-        // Clear session
-        session()->forget('sale_id');
+            // Log final customer count to ensure no auto-creation occurred
+            \Log::info('POS Checkout - Sale completed', [
+                'sale_id' => $sale->id,
+                'customer_id' => $customerId,
+                'total_customers_after' => Customer::count()
+            ]);
+
+            // Generate receipt data
+            $receiptData = [
+                'sale_id' => $sale->id,
+                'date' => $sale->sale_date->format('Y-m-d H:i:s'),
+                'customer' => $customerId ? Customer::find($customerId)->name : 'Walk-in Customer',
+                'items' => $receiptItems,
+                'subtotal' => $totalAmount - $request->input('tax_amount', 0),
+                'discount' => $request->input('discount_amount', 0),
+                'tax' => $request->input('tax_amount', 0),
+                'total' => $totalAmount,
+                'payment_method' => $paymentMethod
+            ];
 
             return response()->json([
                 'success' => true,
                 'message' => 'Sale completed successfully!',
                 'sale_id' => $sale->id,
-                'redirect' => route('admin.sales.receipt', $sale->id),
+                'receipt' => $receiptData,
             ]);
             
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Checkout validation failed', ['errors' => $e->errors()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed: ' . implode(', ', array_flatten($e->errors()))
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
+            \DB::rollBack();
             Log::error('Checkout failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,

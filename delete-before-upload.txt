@@ -1,0 +1,33 @@
+DELETE THESE FILES/FOLDERS BEFORE CPANEL UPLOAD:
+
+FOLDERS:
+- node_modules/
+- .git/
+- tests/
+- docker/
+
+FILES:
+- docker-compose.yml
+- Dockerfile
+- railway.toml
+- nixpacks.toml
+- .gitignore
+- README.md (optional)
+- package.json
+- package-lock.json
+- vite.config.js
+
+KEEP THESE IMPORTANT FILES:
+- All app/ folder
+- All config/ folder  
+- All database/ folder
+- All public/ folder
+- All resources/ folder
+- All routes/ folder
+- All storage/ folder
+- All vendor/ folder
+- .env.production (rename to .env)
+- composer.json
+- composer.lock
+- artisan
+- bootstrap/ folder

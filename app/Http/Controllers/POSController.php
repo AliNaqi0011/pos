@@ -49,18 +49,24 @@ class POSController extends Controller
 
     public function filterProducts(Request $request)
     {
+        $request->validate([
+            'category_id' => 'nullable|integer|exists:categories,id',
+            'brand_id' => 'nullable|integer|exists:brands,id',
+            'warehouse_id' => 'nullable|integer|exists:warehouses,id'
+        ]);
+        
         $query = Product::query();
 
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->validated()['category_id']);
         }
 
-        if ($request->has('brand_id')) {
-            $query->where('brand_id', $request->brand_id);
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->validated()['brand_id']);
         }
 
-        if ($request->has('warehouse_id')) {
-            $query->where('warehouse_id', $request->warehouse_id);
+        if ($request->filled('warehouse_id')) {
+            $query->where('warehouse_id', $request->validated()['warehouse_id']);
         }
 
         $products = $query->get();

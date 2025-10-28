@@ -6,6 +6,12 @@ use App\Http\Controllers\Api\MobilePOSController;
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\ApiDocumentationController;
+
+// Health check and documentation (public)
+Route::get('/health', [HealthCheckController::class, 'check']);
+Route::get('/docs', [ApiDocumentationController::class, 'index']);
 
 // Public API routes
 Route::prefix('v1')->group(function () {

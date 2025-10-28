@@ -28,7 +28,8 @@ class BarcodeController extends Controller
     
     public function scanProduct(Request $request)
     {
-        $barcode = $request->get('barcode');
+        $request->validate(['barcode' => 'required|string|max:255']);
+        $barcode = $request->validated()['barcode'];
         $product = Product::where('barcode', $barcode)->first();
         
         if ($product) {
